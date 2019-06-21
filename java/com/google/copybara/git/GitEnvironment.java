@@ -18,7 +18,6 @@ package com.google.copybara.git;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import java.nio.file.FileSystems;
 import java.util.Map;
 
@@ -36,11 +35,17 @@ public class GitEnvironment {
   }
 
   public ImmutableMap<String, String> getEnvironment() {
-    Map<String, String> env = Maps.newHashMap(environment);
+    ImmutableMap.Builder<String, String> env = ImmutableMap.builder();
+    env.putAll(environment);
+
+    // Explicitly set output language to english so parsing of git's output
+    // succeeds independently of users default locale.
+    env.put("LANG", "en_US.UTF-8");
+
     if (noGitPrompt) {
       env.put("GIT_TERMINAL_PROMPT", "0");
     }
-    return ImmutableMap.copyOf(env);
+    return env.build();
   }
 
   /**
